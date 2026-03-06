@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, Switch, Pressable, Alert, I18nManager } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { router } from 'expo-router';
 import tw from 'twrnc';
 import { Header } from '@/components/layout/Header';
 import { Colors } from '@/constants/theme';
@@ -12,10 +13,15 @@ import i18n from '@/i18n';
 
 export default function Settings() {
   const { t } = useTranslation();
-  const { userType, profile } = useAuth();
+  const { userType, profile, switchRole } = useAuth();
   const donor = userType === 'DONOR' ? (profile as Donor) : null;
   const [isAvailable, setIsAvailable] = useState(donor?.isAvailable ?? true);
+  const [switching, setSwitching] = useState(false);
   const isArabic = i18n.language === 'ar';
+
+  const canSwitchRole = userType === 'DONOR' || userType === 'PATIENT';
+  const targetRole = userType === 'DONOR' ? 'PATIENT' : 'DONOR';
+  const targetLabel = targetRole === 'DONOR' ? t('onboarding.donor') : t('onboarding.patient');
 
   const toggleLanguage = () => {
     const newLang = isArabic ? 'en' : 'ar';
@@ -33,6 +39,31 @@ export default function Settings() {
     try { await donorService.toggleAvailability(val); } catch { setIsAvailable(!val); }
   };
 
+  const handleSwitchRole = () => {
+    Alert.alert(
+      t('settings.switchRole'),
+      t('settings.switchRoleConfirm', { role: targetLabel }),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('common.confirm'),
+          onPress: async () => {
+            setSwitching(true);
+            try {
+              await switchRole(targetRole);
+              Alert.alert(t('common.done'), t('settings.switchedRole', { role: targetLabel }));
+              router.replace('/(tabs)');
+            } catch (e: any) {
+              Alert.alert(t('common.error'), e?.message);
+            } finally {
+              setSwitching(false);
+            }
+          },
+        },
+      ],
+    );
+  };
+
   return (
     <View style={tw`flex-1 bg-gray-50`}>
       <Header title={t('settings.title')} showBack />
@@ -48,7 +79,7 @@ export default function Settings() {
         </Pressable>
 
         {userType === 'DONOR' && (
-          <View style={tw`flex-row items-center justify-between px-5 py-4`}>
+          <View style={tw`flex-row items-center justify-between px-5 py-4 border-b border-gray-100`}>
             <View style={tw`flex-row items-center flex-1`}>
               <MaterialIcons name="bloodtype" size={22} color={Colors.textSecondary} />
               <View style={tw`ml-4 flex-1`}>
@@ -63,6 +94,28 @@ export default function Settings() {
               thumbColor={isAvailable ? Colors.primary : '#9CA3AF'}
             />
           </View>
+        )}
+
+        {canSwitchRole && (
+          <Pressable
+            onPress={handleSwitchRole}
+            disabled={switching}
+            style={({ pressed }) => [
+              tw`flex-row items-center justify-between px-5 py-4`,
+              pressed && tw`bg-gray-50`,
+            ]}
+          >
+            <View style={tw`flex-row items-center flex-1`}>
+              <MaterialIcons name="swap-horiz" size={22} color={Colors.textSecondary} />
+              <View style={tw`ml-4 flex-1`}>
+                <Text style={tw`text-base text-gray-900`}>{t('settings.switchRole')}</Text>
+                <Text style={tw`text-xs text-gray-500`}>{t('settings.switchRoleDesc')}</Text>
+              </View>
+            </View>
+            <Text style={[tw`text-sm font-semibold`, { color: Colors.primary }]}>
+              {switching ? t('common.loading') : targetLabel}
+            </Text>
+          </Pressable>
         )}
       </View>
 

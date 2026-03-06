@@ -20,6 +20,7 @@ import { BloodRequest, DonationOffer } from '@/types/blood-request';
 import { getBloodTypeLabel } from '@/utils/blood-type';
 import { timeAgo, formatDate } from '@/utils/date';
 import { shareBloodRequest } from '@/utils/share';
+import { chatService } from '@/services/chat.service';
 import { MaterialIcons } from '@expo/vector-icons';
 
 export default function BloodRequestDetail() {
@@ -81,6 +82,15 @@ export default function BloodRequestDetail() {
     try { await donationOfferService.complete(offerId); loadData(); } catch {}
   };
 
+  const handleStartChat = async () => {
+    try {
+      const room = await chatService.createRoom(id!);
+      router.push(`/chat/${room.id}`);
+    } catch (e: any) {
+      Alert.alert(t('common.error'), e?.message);
+    }
+  };
+
   if (loading || !request) return <LoadingSpinner />;
 
   const isOwner = userType === 'PATIENT' && (profile as any)?.id === request.patientId;
@@ -127,6 +137,11 @@ export default function BloodRequestDetail() {
               <Button title={t('bloodRequest.offerToDonate')} onPress={handleOffer} loading={actionLoading} />
             </View>
           )}
+          {isDonor && (
+            <View style={tw`flex-1`}>
+              <Button title={t('chat.startChat')} variant="secondary" onPress={handleStartChat} icon={<MaterialIcons name="chat" size={18} color={Colors.primary} />} />
+            </View>
+          )}
           <View style={tw`flex-1`}>
             <Button title={t('bloodRequest.share')} variant="secondary" onPress={handleShare} icon={<MaterialIcons name="share" size={18} color={Colors.primary} />} />
           </View>
@@ -159,8 +174,15 @@ export default function BloodRequestDetail() {
                   </View>
                 )}
                 {offer.status === 'ACCEPTED' && (
-                  <View style={tw`mt-3`}>
-                    <Button title={t('bloodRequest.completeOffer')} onPress={() => handleCompleteOffer(offer.id)} />
+                  <View style={tw`flex-row gap-3 mt-3`}>
+                    <View style={tw`flex-1`}>
+                      <Button title={t('bloodRequest.completeOffer')} onPress={() => handleCompleteOffer(offer.id)} />
+                    </View>
+                    {isOwner && (
+                      <View style={tw`flex-1`}>
+                        <Button title={t('chat.startChat')} variant="secondary" onPress={handleStartChat} icon={<MaterialIcons name="chat" size={18} color={Colors.primary} />} />
+                      </View>
+                    )}
                   </View>
                 )}
               </Card>

@@ -64,6 +64,7 @@ interface AuthState {
   adminToken: string | null;
   adminProfile: Admin | null;
   setUserTypeAndRegister: (type: UserRole, registerData: any) => Promise<void>;
+  switchRole: (targetType: 'DONOR' | 'PATIENT') => Promise<void>;
   loginAdmin: (email: string, password: string) => Promise<void>;
   logoutAdmin: () => Promise<void>;
   logout: () => Promise<void>;
@@ -157,6 +158,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setProfile(p);
   }, [deviceId]);
 
+  const switchRole = useCallback(async (targetType: 'DONOR' | 'PATIENT') => {
+    const id = deviceId || await getDeviceId();
+    api.setDeviceAuth(id, targetType);
+
+    let p: Profile = null;
+    try {
+      // Try fetching existing profile for this role
+      p = await fetchProfile(targetType);
+    } catch {
+      // Not registered as this role yet — auto-register with current profile's name/mobile
+      const currentName = (profile as any)?.name || '';
+      const currentMobile = (profile as any)?.mobile || (profile as any)?.phone || '';
+      if (targetType === 'PATIENT') {
+        p = await patientService.register({ name: currentName, mobile: currentMobile });
+      } else {
+        p = await donorService.register({ name: currentName, mobile: currentMobile, bloodType: 'O_POSITIVE', gender: 'MALE', latitude: 0, longitude: 0 });
+      }
+    }
+
+    await setItem(STORAGE_KEYS.USER_TYPE, targetType);
+    setUserType(targetType);
+    setProfile(p);
+  }, [deviceId, profile]);
+
   const loginAdmin = useCallback(async (email: string, password: string) => {
     const tokens: AdminTokens = await authService.adminLogin({ email, password });
     api.setAdminToken(tokens.accessToken);
@@ -224,6 +249,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       adminToken,
       adminProfile,
       setUserTypeAndRegister,
+      switchRole,
       loginAdmin,
       logoutAdmin,
       logout,

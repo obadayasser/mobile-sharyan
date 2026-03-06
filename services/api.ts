@@ -63,13 +63,35 @@ class ApiClient {
     const { method = 'GET', body, headers, params } = options;
     const url = this.buildUrl(endpoint, params);
 
-    const response = await fetch(url, {
-      method,
-      headers: this.buildHeaders(headers),
-      body: body ? JSON.stringify(body) : undefined,
-    });
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        method,
+        headers: this.buildHeaders(headers),
+        body: body ? JSON.stringify(body) : undefined,
+      });
+    } catch (networkError: any) {
+      // fetch throws TypeError on network failure (no internet, server down, DNS error, etc.)
+      console.error(`[API] Network error: ${method} ${url}`, networkError?.message);
+      throw {
+        statusCode: 0,
+        message: `Network error: Could not connect to server. Check that the server is running and the IP is correct in config.ts. (${url})`,
+        error: 'NetworkError',
+        timestamp: new Date().toISOString(),
+      };
+    }
 
-    const json = await response.json();
+    let json: any;
+    try {
+      json = await response.json();
+    } catch {
+      throw {
+        statusCode: response.status,
+        message: `Server returned invalid JSON (status ${response.status})`,
+        error: 'ParseError',
+        timestamp: new Date().toISOString(),
+      };
+    }
 
     if (!response.ok) {
       throw {

@@ -19,7 +19,11 @@ export default function BadgesScreen() {
     Promise.all([
       gamificationService.getBadges().catch(() => []),
       donorService.getMyBadges().catch(() => []),
-    ]).then(([all, mine]) => { setAllBadges(all); setMyBadges(mine); setLoading(false); });
+    ]).then(([all, mine]) => {
+      setAllBadges(Array.isArray(all) ? all : []);
+      setMyBadges(Array.isArray(mine) ? mine : []);
+      setLoading(false);
+    });
   }, []);
 
   if (loading) return <LoadingSpinner />;

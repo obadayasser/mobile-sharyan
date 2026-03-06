@@ -187,7 +187,8 @@
     "typeMessage": "اكتب رسالة...",
     "send": "إرسال",
     "typing": "يكتب...",
-    "noMessages": "لا توجد رسائل بعد"
+    "noMessages": "لا توجد رسائل بعد",
+    "startChat": "بدء محادثة"
   },
   "gamification": {
     "badges": "الشارات",
@@ -258,7 +259,15 @@
     "notifications": "الإشعارات",
     "notificationsDesc": "تلقي إشعارات بطلبات الدم القريبة",
     "about": "عن التطبيق",
-    "version": "الإصدار"
+    "version": "الإصدار",
+    "switchRole": "تبديل الوضع",
+    "switchToDonor": "التبديل إلى متبرع",
+    "switchToPatient": "التبديل إلى محتاج للدم",
+    "switchRoleDesc": "التبديل بين وضع المتبرع ووضع المحتاج للدم",
+    "switchRoleConfirm": "هل تريد التبديل إلى وضع {{role}}؟",
+    "switchedRole": "تم التبديل إلى وضع {{role}}",
+    "registeringAsPatient": "جاري تسجيلك كمحتاج للدم...",
+    "registeringAsDonor": "جاري تسجيلك كمتبرع..."
   },
   "errors": {
     "networkError": "خطأ في الاتصال بالشبكة",

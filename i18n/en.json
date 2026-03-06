@@ -187,7 +187,8 @@
     "typeMessage": "Type a message...",
     "send": "Send",
     "typing": "typing...",
-    "noMessages": "No messages yet"
+    "noMessages": "No messages yet",
+    "startChat": "Start Chat"
   },
   "gamification": {
     "badges": "Badges",
@@ -258,7 +259,15 @@
     "notifications": "Notifications",
     "notificationsDesc": "Receive notifications for nearby blood requests",
     "about": "About",
-    "version": "Version"
+    "version": "Version",
+    "switchRole": "Switch Mode",
+    "switchToDonor": "Switch to Donor",
+    "switchToPatient": "Switch to Need Blood",
+    "switchRoleDesc": "Switch between donor and need blood modes",
+    "switchRoleConfirm": "Switch to {{role}} mode?",
+    "switchedRole": "Switched to {{role}} mode",
+    "registeringAsPatient": "Registering as patient...",
+    "registeringAsDonor": "Registering as donor..."
   },
   "errors": {
     "networkError": "Network connection error",
