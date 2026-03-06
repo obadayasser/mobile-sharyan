@@ -14,7 +14,7 @@ interface BadgeCardProps {
   earnedAt?: string;
 }
 
-export default function BadgeCard({ badge, earned, earnedAt }: BadgeCardProps) {
+export function BadgeCard({ badge, earned, earnedAt }: BadgeCardProps) {
   const { t } = useTranslation();
 
   return (

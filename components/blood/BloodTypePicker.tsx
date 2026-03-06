@@ -2,14 +2,14 @@ import React from 'react';
 import { View } from 'react-native';
 import tw from 'twrnc';
 import { BloodType, BLOOD_TYPES } from '@/constants/enums';
-import BloodTypeChip from '@/components/blood/BloodTypeChip';
+import { BloodTypeChip } from '@/components/blood/BloodTypeChip';
 
 interface BloodTypePickerProps {
   selected: BloodType | null;
   onSelect: (bloodType: BloodType) => void;
 }
 
-export default function BloodTypePicker({ selected, onSelect }: BloodTypePickerProps) {
+export function BloodTypePicker({ selected, onSelect }: BloodTypePickerProps) {
   return (
     <View style={tw`flex-row flex-wrap gap-2`}>
       {BLOOD_TYPES.map((type) => (

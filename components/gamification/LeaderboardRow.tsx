@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import tw from 'twrnc';
 import { LeaderboardEntry } from '@/types/gamification';
-import BloodTypeChip from '@/components/blood/BloodTypeChip';
+import { BloodTypeChip } from '@/components/blood/BloodTypeChip';
 import { Colors } from '@/constants/theme';
 import { useTranslation } from 'react-i18next';
 
@@ -18,7 +18,7 @@ const rankColors: Record<number, string> = {
   3: '#CD7F32', // bronze
 };
 
-export default function LeaderboardRow({ entry, rank, isCurrentUser }: LeaderboardRowProps) {
+export function LeaderboardRow({ entry, rank, isCurrentUser }: LeaderboardRowProps) {
   const { t } = useTranslation();
   const rankColor = rankColors[rank];
 

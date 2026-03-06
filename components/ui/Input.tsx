@@ -15,7 +15,7 @@ interface InputProps {
   editable?: boolean;
 }
 
-export default function Input({
+export function Input({
   label,
   value,
   onChangeText,

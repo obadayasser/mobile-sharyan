@@ -25,7 +25,7 @@ const stockMaxMap: Record<StockLevel, number> = {
   HIGH: 100,
 };
 
-export default function StockLevelBar({ bloodType, stockLevel, bagsCount }: StockLevelBarProps) {
+export function StockLevelBar({ bloodType, stockLevel, bagsCount }: StockLevelBarProps) {
   const color = stockColorMap[stockLevel];
   const fillPercent = stockMaxMap[stockLevel];
 

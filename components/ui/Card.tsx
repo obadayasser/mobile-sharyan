@@ -9,7 +9,7 @@ interface CardProps {
   style?: ViewStyle;
 }
 
-export default function Card({ children, onPress, style }: CardProps) {
+export function Card({ children, onPress, style }: CardProps) {
   return (
     <MotiView
       from={{ opacity: 0, translateY: 10 }}

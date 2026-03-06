@@ -5,7 +5,7 @@ import { MotiView } from 'moti';
 import { Colors } from '@/constants/theme';
 import { useTranslation } from 'react-i18next';
 
-export default function TypingIndicator() {
+export function TypingIndicator() {
   const { t } = useTranslation();
 
   return (

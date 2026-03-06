@@ -9,7 +9,7 @@ interface AvatarProps {
   color?: string;
 }
 
-export default function Avatar({ name, size = 48, color = Colors.primary }: AvatarProps) {
+export function Avatar({ name, size = 48, color = Colors.primary }: AvatarProps) {
   const initial = name.charAt(0).toUpperCase();
   const fontSize = size * 0.4;
 

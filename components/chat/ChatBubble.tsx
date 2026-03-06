@@ -9,7 +9,7 @@ interface ChatBubbleProps {
   isOwn: boolean;
 }
 
-export default function ChatBubble({ message, isOwn }: ChatBubbleProps) {
+export function ChatBubble({ message, isOwn }: ChatBubbleProps) {
   const time = new Date(message.createdAt).toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',

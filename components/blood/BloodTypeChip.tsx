@@ -8,12 +8,14 @@ interface BloodTypeChipProps {
   bloodType: BloodType;
   selected?: boolean;
   onPress?: () => void;
+  label?: string;
 }
 
-export default function BloodTypeChip({
+export function BloodTypeChip({
   bloodType,
   selected = false,
   onPress,
+  label,
 }: BloodTypeChipProps) {
   return (
     <Pressable
@@ -33,7 +35,7 @@ export default function BloodTypeChip({
           selected ? tw`text-white` : tw`text-red-600`,
         ]}
       >
-        {getBloodTypeLabel(bloodType)}
+        {label || getBloodTypeLabel(bloodType)}
       </Text>
     </Pressable>
   );

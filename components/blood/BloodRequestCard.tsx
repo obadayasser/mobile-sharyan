@@ -3,9 +3,9 @@ import { View, Text } from 'react-native';
 import tw from 'twrnc';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import Card from '@/components/ui/Card';
-import BloodTypeChip from '@/components/blood/BloodTypeChip';
-import UrgencyIndicator from '@/components/blood/UrgencyIndicator';
+import { Card } from '@/components/ui/Card';
+import { BloodTypeChip } from '@/components/blood/BloodTypeChip';
+import { UrgencyIndicator } from '@/components/blood/UrgencyIndicator';
 import { BloodRequest } from '@/types/blood-request';
 import { Colors } from '@/constants/theme';
 import { timeAgo } from '@/utils/date';
@@ -15,7 +15,7 @@ interface BloodRequestCardProps {
   onPress: () => void;
 }
 
-export default function BloodRequestCard({ request, onPress }: BloodRequestCardProps) {
+export function BloodRequestCard({ request, onPress }: BloodRequestCardProps) {
   const { t } = useTranslation();
   const progressPercent =
     request.bagsNeeded > 0

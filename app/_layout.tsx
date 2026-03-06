@@ -1,24 +1,53 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import '@/i18n';
+import 'react-native-reanimated';
+import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { I18nManager } from 'react-native';
+import * as SplashScreen from 'expo-splash-screen';
+import { AuthProvider } from '@/store/AuthContext';
+import { SocketProvider } from '@/store/SocketContext';
+import { NotificationProvider } from '@/store/NotificationContext';
+import i18n from '@/i18n';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+SplashScreen.preventAutoHideAsync();
 
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+// Force RTL for Arabic
+if (i18n.language === 'ar' && !I18nManager.isRTL) {
+  I18nManager.allowRTL(true);
+  I18nManager.forceRTL(true);
+} else if (i18n.language !== 'ar' && I18nManager.isRTL) {
+  I18nManager.allowRTL(false);
+  I18nManager.forceRTL(false);
+}
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  useEffect(() => {
+    SplashScreen.hideAsync();
+  }, []);
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <AuthProvider>
+      <SocketProvider>
+        <NotificationProvider>
+          <StatusBar style="dark" />
+          <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="blood-request/[id]" />
+            <Stack.Screen name="blood-request/create" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="blood-bank/[id]" />
+            <Stack.Screen name="donor/[id]" />
+            <Stack.Screen name="chat" />
+            <Stack.Screen name="campaigns" />
+            <Stack.Screen name="gamification" />
+            <Stack.Screen name="admin" />
+            <Stack.Screen name="settings" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="edit-profile" options={{ presentation: 'modal' }} />
+          </Stack>
+        </NotificationProvider>
+      </SocketProvider>
+    </AuthProvider>
   );
 }

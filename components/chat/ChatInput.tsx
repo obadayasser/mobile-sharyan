@@ -8,7 +8,7 @@ interface ChatInputProps {
   onSend: (message: string) => void;
 }
 
-export default function ChatInput({ onSend }: ChatInputProps) {
+export function ChatInput({ onSend }: ChatInputProps) {
   const [text, setText] = useState('');
   const isRTL = I18nManager.isRTL;
   const canSend = text.trim().length > 0;

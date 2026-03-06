@@ -11,7 +11,7 @@ interface SearchBarProps {
   onFilter?: () => void;
 }
 
-export default function SearchBar({ value, onChangeText, placeholder, onFilter }: SearchBarProps) {
+export function SearchBar({ value, onChangeText, placeholder, onFilter }: SearchBarProps) {
   const isRTL = I18nManager.isRTL;
 
   return (

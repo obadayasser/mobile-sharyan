@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import tw from 'twrnc';
-import Card from '@/components/ui/Card';
-import Avatar from '@/components/ui/Avatar';
-import BloodTypeChip from '@/components/blood/BloodTypeChip';
+import { Card } from '@/components/ui/Card';
+import { Avatar } from '@/components/ui/Avatar';
+import { BloodTypeChip } from '@/components/blood/BloodTypeChip';
 import { DonorSearchResult } from '@/types/donor';
 import { Colors } from '@/constants/theme';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +13,7 @@ interface DonorCardProps {
   onPress: () => void;
 }
 
-export default function DonorCard({ donor, onPress }: DonorCardProps) {
+export function DonorCard({ donor, onPress }: DonorCardProps) {
   const { t } = useTranslation();
 
   return (

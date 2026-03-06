@@ -35,7 +35,7 @@ const variantStyles: Record<ButtonVariant, { container: ViewStyle; textColor: st
   },
 };
 
-export default function Button({
+export function Button({
   title,
   onPress,
   variant = 'primary',

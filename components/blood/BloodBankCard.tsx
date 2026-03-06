@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import tw from 'twrnc';
 import { Ionicons } from '@expo/vector-icons';
-import Card from '@/components/ui/Card';
-import Badge from '@/components/ui/Badge';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
 import { BloodBank } from '@/types/blood-bank';
 import { Colors } from '@/constants/theme';
 
@@ -19,7 +19,7 @@ const statusColorMap: Record<string, 'success' | 'warning' | 'error' | 'primary'
   SUSPENDED: 'error',
 };
 
-export default function BloodBankCard({ bloodBank, onPress }: BloodBankCardProps) {
+export function BloodBankCard({ bloodBank, onPress }: BloodBankCardProps) {
   return (
     <Card onPress={onPress}>
       <View style={tw`flex-row items-start justify-between mb-2`}>

@@ -11,7 +11,7 @@ interface EmptyStateProps {
   action?: React.ReactNode;
 }
 
-export default function EmptyState({ icon, title, subtitle, action }: EmptyStateProps) {
+export function EmptyState({ icon, title, subtitle, action }: EmptyStateProps) {
   return (
     <View style={tw`flex-1 items-center justify-center px-8 py-12`}>
       <MaterialIcons name={icon} size={64} color={Colors.textLight} />

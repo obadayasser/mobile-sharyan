@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import tw from 'twrnc';
 import { useTranslation } from 'react-i18next';
-import Card from '@/components/ui/Card';
-import Badge from '@/components/ui/Badge';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
 import { Campaign } from '@/types/campaign';
 import { Colors } from '@/constants/theme';
 import { formatDate } from '@/utils/date';
@@ -21,7 +21,7 @@ const statusColorMap: Record<string, 'success' | 'warning' | 'error' | 'primary'
   CANCELLED: 'error',
 };
 
-export default function CampaignCard({ campaign, onPress }: CampaignCardProps) {
+export function CampaignCard({ campaign, onPress }: CampaignCardProps) {
   const { t } = useTranslation();
   const isArabic = i18n.language === 'ar';
   const displayTitle = isArabic && campaign.titleAr ? campaign.titleAr : campaign.title;

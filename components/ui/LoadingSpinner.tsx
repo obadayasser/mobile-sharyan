@@ -8,7 +8,7 @@ interface LoadingSpinnerProps {
   color?: string;
 }
 
-export default function LoadingSpinner({
+export function LoadingSpinner({
   size = 'large',
   color = Colors.primary,
 }: LoadingSpinnerProps) {

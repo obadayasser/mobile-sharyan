@@ -16,7 +16,7 @@ const urgencyConfig: Record<BloodRequestUrgency, { bg: string; text: string; lab
   EMERGENCY: { bg: '#FEE2E2', text: Colors.primary, label: 'urgency.emergency' },
 };
 
-export default function UrgencyIndicator({ urgency }: UrgencyIndicatorProps) {
+export function UrgencyIndicator({ urgency }: UrgencyIndicatorProps) {
   const { t } = useTranslation();
   const config = urgencyConfig[urgency];
 

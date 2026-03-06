@@ -3,31 +3,23 @@ import { View, Text } from 'react-native';
 import tw from 'twrnc';
 import { Colors } from '@/constants/theme';
 
-type BadgeColor = 'primary' | 'success' | 'warning' | 'error';
 type BadgeVariant = 'filled' | 'outlined';
 type BadgeSize = 'sm' | 'md';
 
 interface BadgeProps {
   label: string;
-  color?: BadgeColor;
+  color?: string;
   variant?: BadgeVariant;
   size?: BadgeSize;
 }
 
-const colorMap: Record<BadgeColor, string> = {
-  primary: Colors.primary,
-  success: Colors.success,
-  warning: Colors.warning,
-  error: Colors.error,
-};
-
-export default function Badge({
+export function Badge({
   label,
-  color = 'primary',
+  color = Colors.primary,
   variant = 'filled',
   size = 'md',
 }: BadgeProps) {
-  const bgColor = colorMap[color];
+  const bgColor = color;
   const isFilled = variant === 'filled';
   const isSmall = size === 'sm';
 

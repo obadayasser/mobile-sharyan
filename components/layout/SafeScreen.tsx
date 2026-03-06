@@ -10,7 +10,7 @@ interface SafeScreenProps {
   style?: ViewStyle;
 }
 
-export default function SafeScreen({ children, scroll = false, style }: SafeScreenProps) {
+export function SafeScreen({ children, scroll = false, style }: SafeScreenProps) {
   return (
     <SafeAreaView style={[tw`flex-1`, { backgroundColor: Colors.background }, style]}>
       {scroll ? (

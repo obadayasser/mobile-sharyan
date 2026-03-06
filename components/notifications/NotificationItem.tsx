@@ -26,7 +26,7 @@ const iconMap: Record<NotificationType, keyof typeof MaterialIcons.glyphMap> = {
   SYSTEM: 'info',
 };
 
-export default function NotificationItem({ notification, onPress }: NotificationItemProps) {
+export function NotificationItem({ notification, onPress }: NotificationItemProps) {
   const isArabic = i18n.language === 'ar';
   const displayTitle = isArabic && notification.titleAr ? notification.titleAr : notification.title;
   const displayBody = isArabic && notification.bodyAr ? notification.bodyAr : notification.body;
