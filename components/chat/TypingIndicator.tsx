@@ -9,20 +9,20 @@ export function TypingIndicator() {
   const { t } = useTranslation();
 
   return (
-    <View style={tw`flex-row items-center px-4 py-2`}>
-      <View style={tw`flex-row items-center gap-1`}>
+    <View style={tw`flex-row items-center px-5 py-2`}>
+      <View style={[tw`flex-row items-center gap-1 bg-gray-100 rounded-2xl rounded-bl-sm px-3 py-2`]}>
         {[0, 1, 2].map((index) => (
           <MotiView
             key={index}
-            from={{ translateY: 0, opacity: 0.4 }}
-            animate={{ translateY: -4, opacity: 1 }}
+            from={{ translateY: 0, opacity: 0.3 }}
+            animate={{ translateY: -3, opacity: 1 }}
             transition={{
               type: 'timing',
               duration: 400,
               delay: index * 150,
               loop: true,
             }}
-            style={[tw`w-2 h-2 rounded-full`, { backgroundColor: Colors.textLight }]}
+            style={[tw`w-1.5 h-1.5 rounded-full`, { backgroundColor: Colors.textSecondary }]}
           />
         ))}
       </View>

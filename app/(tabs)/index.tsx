@@ -119,27 +119,30 @@ function DonorHome() {
         </View>
       </View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={tw`bg-white border-b border-gray-100`}
-        contentContainerStyle={tw`px-4 py-3 gap-2`}
-      >
-        <BloodTypeChip
-          bloodType={'ALL' as any}
-          selected={!selectedType}
-          onPress={() => setSelectedType(null)}
-          label={t('common.all')}
-        />
-        {BLOOD_TYPES.map((type) => (
-          <BloodTypeChip
-            key={type}
-            bloodType={type}
-            selected={selectedType === type}
-            onPress={() => setSelectedType(selectedType === type ? null : type)}
-          />
-        ))}
-      </ScrollView>
+      <View style={tw`bg-white`}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={tw`px-4 py-3`}
+        >
+          <View style={tw`flex-row gap-2`}>
+            <BloodTypeChip
+              bloodType={'ALL' as any}
+              selected={!selectedType}
+              onPress={() => setSelectedType(null)}
+              label={t('common.all')}
+            />
+            {BLOOD_TYPES.map((type) => (
+              <BloodTypeChip
+                key={type}
+                bloodType={type}
+                selected={selectedType === type}
+                onPress={() => setSelectedType(selectedType === type ? null : type)}
+              />
+            ))}
+          </View>
+        </ScrollView>
+      </View>
 
       {loading && !refreshing ? (
         <LoadingSpinner />
@@ -164,9 +167,16 @@ function DonorHome() {
           }
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.3}
-          contentContainerStyle={tw`pb-24 pt-2`}
+          contentContainerStyle={[
+            tw`pb-24 pt-1`,
+            requests.length === 0 && tw`flex-1`,
+          ]}
           ListEmptyComponent={
-            <EmptyState icon="bloodtype" title={t('home.noRequests')} />
+            <EmptyState
+              icon="bloodtype"
+              title={t('home.noRequests')}
+              subtitle={t('common.pullToRefresh')}
+            />
           }
         />
       )}

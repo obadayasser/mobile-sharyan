@@ -12,15 +12,18 @@ import { ChatRoom } from '@/types/chat';
 import { useAuth } from '@/store/AuthContext';
 import { timeAgo } from '@/utils/date';
 import { Colors } from '@/constants/theme';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function ChatRooms() {
   const { t } = useTranslation();
-  const { userType, profile } = useAuth();
+  const { userType } = useAuth();
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    chatService.getRooms().then(setRooms).catch(() => {}).finally(() => setLoading(false));
+    chatService.getRooms().then((res) => {
+      setRooms(Array.isArray(res) ? res : []);
+    }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   if (loading) return <LoadingSpinner />;
@@ -36,28 +39,55 @@ export default function ChatRooms() {
       <FlatList
         data={rooms}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={tw`pb-10`}
-        renderItem={({ item }) => {
+        contentContainerStyle={rooms.length === 0 ? tw`flex-1` : tw`pb-10`}
+        renderItem={({ item, index }) => {
           const other = getOtherUser(item);
+          const isLast = index === rooms.length - 1;
           return (
             <Pressable
               onPress={() => router.push(`/chat/${item.id}`)}
-              style={({ pressed }) => [tw`flex-row items-center px-5 py-4 bg-white border-b border-gray-100`, pressed && tw`bg-gray-50`]}
+              style={({ pressed }) => [
+                tw`flex-row items-center px-4 py-3.5 mx-3 rounded-2xl`,
+                pressed ? tw`bg-gray-100` : tw`bg-white`,
+                !isLast && tw`mb-2`,
+              ]}
             >
-              <Avatar name={other?.name || '?'} size={48} />
+              <Avatar name={other?.name || '?'} size={50} />
               <View style={tw`flex-1 ml-3`}>
-                <Text style={tw`font-semibold text-gray-900`}>{other?.name || t('chat.title')}</Text>
-                {item.lastMessage && (
-                  <Text style={tw`text-sm text-gray-500 mt-0.5`} numberOfLines={1}>{item.lastMessage.content}</Text>
+                <View style={tw`flex-row items-center justify-between`}>
+                  <Text style={tw`font-bold text-base text-gray-900`} numberOfLines={1}>
+                    {other?.name || t('chat.title')}
+                  </Text>
+                  {item.lastMessage && (
+                    <Text style={tw`text-xs text-gray-400 ml-2`}>
+                      {timeAgo(item.lastMessage.createdAt)}
+                    </Text>
+                  )}
+                </View>
+                {item.lastMessage ? (
+                  <Text style={tw`text-sm text-gray-500 mt-1`} numberOfLines={1}>
+                    {item.lastMessage.content}
+                  </Text>
+                ) : (
+                  <Text style={tw`text-sm text-gray-400 mt-1 italic`}>
+                    {t('chat.noMessages')}
+                  </Text>
                 )}
               </View>
-              {item.lastMessage && (
-                <Text style={tw`text-xs text-gray-400`}>{timeAgo(item.lastMessage.createdAt)}</Text>
-              )}
+              <MaterialIcons name="chevron-right" size={20} color={Colors.textLight} style={tw`ml-1`} />
             </Pressable>
           );
         }}
-        ListEmptyComponent={<EmptyState icon="chat" title={t('chat.noChats')} />}
+        ListHeaderComponent={
+          rooms.length > 0 ? <View style={tw`h-3`} /> : null
+        }
+        ListEmptyComponent={
+          <EmptyState
+            icon="chat-bubble-outline"
+            title={t('chat.noChats')}
+            subtitle={t('bloodRequest.chat')}
+          />
+        }
       />
     </View>
   );

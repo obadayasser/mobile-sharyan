@@ -71,15 +71,15 @@ export default function BloodRequestDetail() {
   };
 
   const handleAcceptOffer = async (offerId: string) => {
-    try { await donationOfferService.accept(offerId); loadData(); } catch {}
+    try { await donationOfferService.accept(offerId); loadData(); } catch { }
   };
 
   const handleRejectOffer = async (offerId: string) => {
-    try { await donationOfferService.reject(offerId); loadData(); } catch {}
+    try { await donationOfferService.reject(offerId); loadData(); } catch { }
   };
 
   const handleCompleteOffer = async (offerId: string) => {
-    try { await donationOfferService.complete(offerId); loadData(); } catch {}
+    try { await donationOfferService.complete(offerId); loadData(); } catch { }
   };
 
   const handleStartChat = async () => {
@@ -131,12 +131,13 @@ export default function BloodRequestDetail() {
           <Text style={tw`text-xs text-gray-400 mt-3`}>{timeAgo(request.createdAt)}</Text>
         </Card>
 
-        <View style={tw`flex-row gap-3 mt-4`}>
-          {isDonor && request.status === 'OPEN' && (
-            <View style={tw`flex-1`}>
-              <Button title={t('bloodRequest.offerToDonate')} onPress={handleOffer} loading={actionLoading} />
-            </View>
-          )}
+        {isDonor && request.status === 'OPEN' && (
+          <View style={tw`mt-4`}>
+            <Button title={t('bloodRequest.offerToDonate')} onPress={handleOffer} loading={actionLoading} fullWidth />
+          </View>
+        )}
+
+        <View style={tw`flex-row gap-3 mt-3`}>
           {isDonor && (
             <View style={tw`flex-1`}>
               <Button title={t('chat.startChat')} variant="secondary" onPress={handleStartChat} icon={<MaterialIcons name="chat" size={18} color={Colors.primary} />} />
@@ -149,7 +150,7 @@ export default function BloodRequestDetail() {
 
         {isOwner && request.status === 'OPEN' && (
           <View style={tw`mt-3`}>
-            <Button title={t('bloodRequest.notifyDonors')} variant="secondary" onPress={handleNotifyDonors} />
+            <Button title={t('bloodRequest.notifyDonors')} variant="secondary" onPress={handleNotifyDonors} fullWidth />
           </View>
         )}
 
@@ -174,14 +175,10 @@ export default function BloodRequestDetail() {
                   </View>
                 )}
                 {offer.status === 'ACCEPTED' && (
-                  <View style={tw`flex-row gap-3 mt-3`}>
-                    <View style={tw`flex-1`}>
-                      <Button title={t('bloodRequest.completeOffer')} onPress={() => handleCompleteOffer(offer.id)} />
-                    </View>
+                  <View style={tw`mt-3 gap-2`}>
+                    <Button title={t('bloodRequest.completeOffer')} onPress={() => handleCompleteOffer(offer.id)} fullWidth />
                     {isOwner && (
-                      <View style={tw`flex-1`}>
-                        <Button title={t('chat.startChat')} variant="secondary" onPress={handleStartChat} icon={<MaterialIcons name="chat" size={18} color={Colors.primary} />} />
-                      </View>
+                      <Button title={t('chat.startChat')} variant="secondary" onPress={handleStartChat} fullWidth icon={<MaterialIcons name="chat" size={18} color={Colors.primary} />} />
                     )}
                   </View>
                 )}
