@@ -1,19 +1,21 @@
 import { useState } from 'react';
-import { View, Text, Switch, Pressable, Alert, I18nManager } from 'react-native';
+import { View, Text, Switch, Pressable, Alert } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { router } from 'expo-router';
 import tw from 'twrnc';
 import { Header } from '@/components/layout/Header';
 import { Colors } from '@/constants/theme';
 import { useAuth } from '@/store/AuthContext';
+import { useNotificationCount } from '@/store/NotificationContext';
 import { donorService } from '@/services/donor.service';
 import { Donor } from '@/types/donor';
 import { MaterialIcons } from '@expo/vector-icons';
-import i18n from '@/i18n';
+import i18n, { setLanguage } from '@/i18n';
 
 export default function Settings() {
   const { t } = useTranslation();
   const { userType, profile, switchRole } = useAuth();
+  const { unreadCount } = useNotificationCount();
   const donor = userType === 'DONOR' ? (profile as Donor) : null;
   const [isAvailable, setIsAvailable] = useState(donor?.isAvailable ?? true);
   const [switching, setSwitching] = useState(false);
@@ -23,14 +25,14 @@ export default function Settings() {
   const targetRole = userType === 'DONOR' ? 'PATIENT' : 'DONOR';
   const targetLabel = targetRole === 'DONOR' ? t('onboarding.donor') : t('onboarding.patient');
 
-  const toggleLanguage = () => {
+  const toggleLanguage = async () => {
     const newLang = isArabic ? 'en' : 'ar';
-    i18n.changeLanguage(newLang);
-    const shouldBeRTL = newLang === 'ar';
-    if (I18nManager.isRTL !== shouldBeRTL) {
-      I18nManager.allowRTL(shouldBeRTL);
-      I18nManager.forceRTL(shouldBeRTL);
-      Alert.alert(t('common.done'), 'Please restart the app for language changes to take effect.');
+    const needsRestart = await setLanguage(newLang);
+    if (needsRestart) {
+      Alert.alert(
+        t('common.done'),
+        'Please fully close and reopen the app for the layout direction to update.'
+      );
     }
   };
 
@@ -68,6 +70,54 @@ export default function Settings() {
     <View style={tw`flex-1 bg-gray-50`}>
       <Header title={t('settings.title')} showBack />
       <View style={tw`mt-4 mx-4 bg-white rounded-2xl overflow-hidden`}>
+        <Pressable
+          onPress={() => router.push('/notifications')}
+          style={({ pressed }) => [
+            tw`flex-row items-center justify-between px-5 py-4 border-b border-gray-100`,
+            pressed && tw`bg-gray-50`,
+          ]}
+        >
+          <View style={tw`flex-row items-center flex-1`}>
+            <MaterialIcons name="notifications-none" size={22} color={Colors.textSecondary} />
+            <Text style={tw`ml-4 text-base text-gray-900`}>{t('settings.notifications')}</Text>
+          </View>
+          {unreadCount > 0 && (
+            <View
+              style={[
+                tw`min-w-5 h-5 px-1.5 rounded-full items-center justify-center mr-2`,
+                { backgroundColor: Colors.primary },
+              ]}
+            >
+              <Text style={tw`text-white text-[10px] font-bold`}>
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </Text>
+            </View>
+          )}
+          <MaterialIcons
+            name={isArabic ? 'chevron-left' : 'chevron-right'}
+            size={20}
+            color={Colors.textLight}
+          />
+        </Pressable>
+
+        <Pressable
+          onPress={() => router.push('/search')}
+          style={({ pressed }) => [
+            tw`flex-row items-center justify-between px-5 py-4 border-b border-gray-100`,
+            pressed && tw`bg-gray-50`,
+          ]}
+        >
+          <View style={tw`flex-row items-center flex-1`}>
+            <MaterialIcons name="search" size={22} color={Colors.textSecondary} />
+            <Text style={tw`ml-4 text-base text-gray-900`}>{t('search.title')}</Text>
+          </View>
+          <MaterialIcons
+            name={isArabic ? 'chevron-left' : 'chevron-right'}
+            size={20}
+            color={Colors.textLight}
+          />
+        </Pressable>
+
         <Pressable onPress={toggleLanguage} style={tw`flex-row items-center justify-between px-5 py-4 border-b border-gray-100`}>
           <View style={tw`flex-row items-center`}>
             <MaterialIcons name="language" size={22} color={Colors.textSecondary} />

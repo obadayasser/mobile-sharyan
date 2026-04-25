@@ -7,6 +7,7 @@ import tw from 'twrnc';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/theme';
 import { useAuth } from '@/store/AuthContext';
+import { useAddress } from '@/hooks/useAddress';
 import { BloodRequestCard } from '@/components/blood/BloodRequestCard';
 import { BloodTypeChip } from '@/components/blood/BloodTypeChip';
 import { BloodBankCard } from '@/components/blood/BloodBankCard';
@@ -36,6 +37,7 @@ function DonorHome() {
   const { t } = useTranslation();
   const { profile } = useAuth();
   const donor = profile as Donor;
+  const address = useAddress(donor?.latitude, donor?.longitude);
   const [requests, setRequests] = useState<BloodRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -100,9 +102,17 @@ function DonorHome() {
               <Text style={tw`text-lg font-bold text-gray-900`}>
                 {t('home.greeting')}, {donor?.name}
               </Text>
+              {address && (
+                <View style={tw`flex-row items-center mt-0.5`}>
+                  <MaterialIcons name="location-on" size={13} color={Colors.textSecondary} />
+                  <Text style={tw`text-xs text-gray-500 ml-1`} numberOfLines={1}>
+                    {address}
+                  </Text>
+                </View>
+              )}
               <Text
                 style={[
-                  tw`text-xs`,
+                  tw`text-xs mt-0.5`,
                   { color: isAvailable ? '#16A34A' : '#9CA3AF' },
                 ]}
               >
@@ -187,6 +197,8 @@ function DonorHome() {
 function PatientHome() {
   const { t } = useTranslation();
   const { profile } = useAuth();
+  const patient = profile as any;
+  const address = useAddress(patient?.latitude, patient?.longitude);
   const [myRequests, setMyRequests] = useState<BloodRequest[]>([]);
   const [banks, setBanks] = useState<BloodBank[]>([]);
   const [loading, setLoading] = useState(true);
@@ -215,9 +227,19 @@ function PatientHome() {
                 style={tw`w-10 h-10 mr-3`}
                 contentFit="contain"
               />
-              <Text style={tw`text-lg font-bold text-gray-900`}>
-                {t('home.greeting')}, {(profile as any)?.name}
-              </Text>
+              <View>
+                <Text style={tw`text-lg font-bold text-gray-900`}>
+                  {t('home.greeting')}, {patient?.name}
+                </Text>
+                {address && (
+                  <View style={tw`flex-row items-center mt-0.5`}>
+                    <MaterialIcons name="location-on" size={13} color={Colors.textSecondary} />
+                    <Text style={tw`text-xs text-gray-500 ml-1`} numberOfLines={1}>
+                      {address}
+                    </Text>
+                  </View>
+                )}
+              </View>
             </View>
           </View>
         </View>
@@ -275,6 +297,8 @@ function PatientHome() {
 function BloodBankHome() {
   const { t } = useTranslation();
   const { profile } = useAuth();
+  const bank = profile as any;
+  const address = useAddress(bank?.latitude, bank?.longitude);
 
   return (
     <SafeAreaView style={tw`flex-1 bg-gray-50`} edges={['top']}>
@@ -285,9 +309,19 @@ function BloodBankHome() {
             style={tw`w-10 h-10 mr-3`}
             contentFit="contain"
           />
-          <Text style={tw`text-lg font-bold text-gray-900`}>
-            {(profile as any)?.name}
-          </Text>
+          <View>
+            <Text style={tw`text-lg font-bold text-gray-900`}>
+              {bank?.name}
+            </Text>
+            {address && (
+              <View style={tw`flex-row items-center mt-0.5`}>
+                <MaterialIcons name="location-on" size={13} color={Colors.textSecondary} />
+                <Text style={tw`text-xs text-gray-500 ml-1`} numberOfLines={1}>
+                  {address}
+                </Text>
+              </View>
+            )}
+          </View>
         </View>
       </View>
       <View style={tw`flex-1 items-center justify-center`}>

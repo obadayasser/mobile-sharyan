@@ -35,7 +35,9 @@
     "requests": "الطلبات",
     "search": "البحث",
     "notifications": "الإشعارات",
-    "profile": "حسابي"
+    "profile": "حسابي",
+    "chat": "تواصل",
+    "more": "المزيد"
   },
   "onboarding": {
     "welcome": "مرحباً بك في شريان",
@@ -46,7 +48,11 @@
     "patient": "محتاج للدم",
     "patientDesc": "أحتاج إلى دم أو أبحث عن متبرعين",
     "bloodBank": "بنك دم",
-    "bloodBankDesc": "إدارة مخزون الدم والحملات"
+    "bloodBankDesc": "إدارة مخزون الدم والحملات",
+    "continueAs": "متابعة باسم {{name}}",
+    "useDifferentAccount": "استخدام حساب آخر",
+    "or": "أو",
+    "restoring": "جاري تسجيل الدخول..."
   },
   "register": {
     "title": "إنشاء حساب",
@@ -158,7 +164,14 @@
     "searchPlaceholder": "ابحث...",
     "filterByBloodType": "تصفية حسب فصيلة الدم",
     "filterByUrgency": "تصفية حسب الأولوية",
-    "noResults": "لا توجد نتائج"
+    "noResults": "لا توجد نتائج",
+    "filters": "الفلاتر",
+    "radius": "ضمن المسافة",
+    "anyDistance": "الكل",
+    "availableOnly": "المتبرعين المتاحين فقط",
+    "includeCompatible": "تضمين الفصائل المتوافقة",
+    "needLocation": "حدّد موقعك للتصفية حسب المسافة",
+    "resultsCount": "{{count}} نتيجة"
   },
   "notifications": {
     "title": "الإشعارات",
@@ -184,9 +197,13 @@
   "chat": {
     "title": "المحادثات",
     "noChats": "لا توجد محادثات",
+    "noResults": "لا توجد نتائج",
     "typeMessage": "اكتب رسالة...",
     "send": "إرسال",
     "typing": "يكتب...",
+    "online": "متصل",
+    "connecting": "جارٍ الاتصال…",
+    "search": "ابحث في المحادثات",
     "noMessages": "لا توجد رسائل بعد",
     "startChat": "بدء محادثة"
   },

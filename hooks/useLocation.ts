@@ -1,9 +1,22 @@
 import { useState, useCallback } from 'react';
 import * as Location from 'expo-location';
 
-interface LocationResult {
+export interface LocationResult {
   latitude: number;
   longitude: number;
+  address?: string;
+}
+
+export function formatGeocode(parts: Location.LocationGeocodedAddress | undefined) {
+  if (!parts) return undefined;
+  const pieces = [
+    parts.district,
+    parts.city || parts.subregion,
+    parts.region,
+  ].filter(Boolean) as string[];
+  // Dedupe consecutive identical pieces (some locales repeat city/region).
+  const unique = pieces.filter((p, i) => p !== pieces[i - 1]);
+  return unique.length ? unique.join(', ') : undefined;
 }
 
 export function useLocation() {
@@ -23,10 +36,16 @@ export function useLocation() {
       const loc = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
       });
-      const result = {
+      const result: LocationResult = {
         latitude: loc.coords.latitude,
         longitude: loc.coords.longitude,
       };
+      try {
+        const geo = await Location.reverseGeocodeAsync(result);
+        result.address = formatGeocode(geo[0]);
+      } catch {
+        // best-effort — no address is fine
+      }
       setLocation(result);
       return result;
     } catch {

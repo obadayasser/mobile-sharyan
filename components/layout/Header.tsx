@@ -3,6 +3,7 @@ import { View, Text, Pressable } from 'react-native';
 import tw from 'twrnc';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/theme';
 
 interface HeaderProps {
@@ -13,12 +14,17 @@ interface HeaderProps {
 
 export function Header({ title, showBack = false, rightAction }: HeaderProps) {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   return (
     <View
       style={[
         tw`flex-row items-center py-3 px-4 bg-white`,
-        { borderBottomWidth: 1, borderBottomColor: Colors.border },
+        {
+          paddingTop: insets.top + 12,
+          borderBottomWidth: 1,
+          borderBottomColor: Colors.border,
+        },
       ]}
     >
       {/* Left: back button or spacer */}

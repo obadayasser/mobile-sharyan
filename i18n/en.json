@@ -35,7 +35,9 @@
     "requests": "Requests",
     "search": "Search",
     "notifications": "Notifications",
-    "profile": "Profile"
+    "profile": "Profile",
+    "chat": "Chat",
+    "more": "More"
   },
   "onboarding": {
     "welcome": "Welcome to Sharyan",
@@ -46,7 +48,11 @@
     "patient": "Need Blood",
     "patientDesc": "I need blood or looking for donors",
     "bloodBank": "Blood Bank",
-    "bloodBankDesc": "Manage blood stock and campaigns"
+    "bloodBankDesc": "Manage blood stock and campaigns",
+    "continueAs": "Continue as {{name}}",
+    "useDifferentAccount": "Use a different account",
+    "or": "or",
+    "restoring": "Logging in..."
   },
   "register": {
     "title": "Create Account",
@@ -158,7 +164,14 @@
     "searchPlaceholder": "Search...",
     "filterByBloodType": "Filter by blood type",
     "filterByUrgency": "Filter by urgency",
-    "noResults": "No results found"
+    "noResults": "No results found",
+    "filters": "Filters",
+    "radius": "Within distance",
+    "anyDistance": "Any",
+    "availableOnly": "Available donors only",
+    "includeCompatible": "Include compatible blood types",
+    "needLocation": "Set your location to filter by distance",
+    "resultsCount": "{{count}} results"
   },
   "notifications": {
     "title": "Notifications",
@@ -184,9 +197,13 @@
   "chat": {
     "title": "Chats",
     "noChats": "No chats yet",
+    "noResults": "No results",
     "typeMessage": "Type a message...",
     "send": "Send",
     "typing": "typing...",
+    "online": "Online",
+    "connecting": "Connecting…",
+    "search": "Search chats",
     "noMessages": "No messages yet",
     "startChat": "Start Chat"
   },

@@ -26,9 +26,9 @@ export default function ProfileTab() {
       {
         text: t('common.yes'),
         style: 'destructive',
-        onPress: () => {
-          logout();
-          router.replace('/');
+        onPress: async () => {
+          await logout();
+          router.replace('/(auth)/onboarding');
         },
       },
     ]);

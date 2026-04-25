@@ -105,18 +105,25 @@ export default function RegisterDonor() {
         <Pressable
           onPress={requestLocation}
           style={[
-            tw`flex-row items-center py-3 px-4 rounded-xl border-2`,
+            tw`py-3 px-4 rounded-xl border-2`,
             { borderColor: location ? Colors.success : errors.location ? Colors.error : '#E5E7EB' },
           ]}
         >
-          <MaterialIcons
-            name={location ? 'check-circle' : 'my-location'}
-            size={22}
-            color={location ? Colors.success : Colors.primary}
-          />
-          <Text style={tw`ml-3 text-sm ${location ? 'text-green-600' : 'text-gray-500'}`}>
-            {locLoading ? t('common.loading') : location ? t('register.locationDetected') : t('register.detectLocation')}
-          </Text>
+          <View style={tw`flex-row items-center`}>
+            <MaterialIcons
+              name={location ? 'check-circle' : 'my-location'}
+              size={22}
+              color={location ? Colors.success : Colors.primary}
+            />
+            <Text style={tw`ml-3 text-sm ${location ? 'text-green-600' : 'text-gray-500'} font-semibold`}>
+              {locLoading ? t('common.loading') : location ? t('register.locationDetected') : t('register.detectLocation')}
+            </Text>
+          </View>
+          {location?.address && (
+            <Text style={tw`mt-1.5 text-sm text-gray-700 ml-8`} numberOfLines={2}>
+              {location.address}
+            </Text>
+          )}
         </Pressable>
         {errors.location && <Text style={tw`text-red-500 text-xs mt-1`}>{errors.location}</Text>}
 

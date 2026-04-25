@@ -20,6 +20,49 @@ const STORAGE_KEYS = {
   ADMIN_REFRESH: 'sharyan_admin_refresh',
 };
 
+// Stored in AsyncStorage (NOT cleared on logout) so we can offer
+// "Continue as <name>" on the onboarding screen.
+const LAST_ACCOUNT_KEY = 'sharyan_last_account';
+
+export interface StoredAccount {
+  type: 'DONOR' | 'PATIENT' | 'BLOOD_BANK';
+  name: string;
+}
+
+async function readLastAccount(): Promise<StoredAccount | null> {
+  try {
+    const raw = await AsyncStorage.getItem(LAST_ACCOUNT_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (
+      parsed &&
+      typeof parsed.name === 'string' &&
+      (parsed.type === 'DONOR' || parsed.type === 'PATIENT' || parsed.type === 'BLOOD_BANK')
+    ) {
+      return parsed as StoredAccount;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+async function writeLastAccount(account: StoredAccount): Promise<void> {
+  try {
+    await AsyncStorage.setItem(LAST_ACCOUNT_KEY, JSON.stringify(account));
+  } catch {
+    // ignore — best effort
+  }
+}
+
+async function clearLastAccount(): Promise<void> {
+  try {
+    await AsyncStorage.removeItem(LAST_ACCOUNT_KEY);
+  } catch {
+    // ignore
+  }
+}
+
 async function getItem(key: string): Promise<string | null> {
   try {
     if (Platform.OS === 'web') return AsyncStorage.getItem(key);
@@ -63,11 +106,13 @@ interface AuthState {
   profile: Profile;
   adminToken: string | null;
   adminProfile: Admin | null;
+  storedAccount: StoredAccount | null;
   setUserTypeAndRegister: (type: UserRole, registerData: any) => Promise<void>;
   switchRole: (targetType: 'DONOR' | 'PATIENT') => Promise<void>;
   loginAdmin: (email: string, password: string) => Promise<void>;
   logoutAdmin: () => Promise<void>;
   logout: () => Promise<void>;
+  restoreLastAccount: () => Promise<boolean>;
   refreshProfile: () => Promise<void>;
   updateProfile: (data: any) => Promise<void>;
 }
@@ -81,11 +126,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Profile>(null);
   const [adminToken, setAdminToken] = useState<string | null>(null);
   const [adminProfile, setAdminProfile] = useState<Admin | null>(null);
+  const [storedAccount, setStoredAccount] = useState<StoredAccount | null>(null);
 
   const isOnboarded = !!userType && !!profile;
 
   useEffect(() => {
     loadStoredAuth();
+    readLastAccount().then(setStoredAccount);
   }, []);
 
   const loadStoredAuth = async () => {
@@ -102,6 +149,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
           const p = await fetchProfile(storedType as UserRole);
           setProfile(p);
+          const fresh: StoredAccount = {
+            type: storedType as StoredAccount['type'],
+            name: (p as any)?.name || '',
+          };
+          await writeLastAccount(fresh);
+          setStoredAccount(fresh);
         } catch {
           // Profile fetch failed, user needs to re-register
           setUserType(null);
@@ -156,6 +209,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUserType(type);
     setDeviceId(id);
     setProfile(p);
+
+    const name = (p as any)?.name || '';
+    const account: StoredAccount = { type: type as StoredAccount['type'], name };
+    await writeLastAccount(account);
+    setStoredAccount(account);
   }, [deviceId]);
 
   const switchRole = useCallback(async (targetType: 'DONOR' | 'PATIENT') => {
@@ -180,6 +238,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await setItem(STORAGE_KEYS.USER_TYPE, targetType);
     setUserType(targetType);
     setProfile(p);
+
+    const name = (p as any)?.name || '';
+    const account: StoredAccount = { type: targetType, name };
+    await writeLastAccount(account);
+    setStoredAccount(account);
   }, [deviceId, profile]);
 
   const loginAdmin = useCallback(async (email: string, password: string) => {
@@ -210,7 +273,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setProfile(null);
     setAdminToken(null);
     setAdminProfile(null);
+    // Note: LAST_ACCOUNT_KEY is intentionally retained so we can offer
+    // "Continue as <name>" on the onboarding screen.
   }, []);
+
+  const restoreLastAccount = useCallback(async () => {
+    const account = await readLastAccount();
+    if (!account) return false;
+    const id = deviceId || (await getDeviceId());
+    api.setDeviceAuth(id, account.type);
+    try {
+      const p = await fetchProfile(account.type as UserRole);
+      if (!p) throw new Error('No profile');
+      await setItem(STORAGE_KEYS.USER_TYPE, account.type);
+      setUserType(account.type as UserRole);
+      setDeviceId(id);
+      setProfile(p);
+      const fresh: StoredAccount = { type: account.type, name: (p as any)?.name || account.name };
+      await writeLastAccount(fresh);
+      setStoredAccount(fresh);
+      return true;
+    } catch {
+      // The stored account no longer exists on the backend — drop the hint.
+      api.clearAuth();
+      await clearLastAccount();
+      setStoredAccount(null);
+      return false;
+    }
+  }, [deviceId]);
 
   const refreshProfile = useCallback(async () => {
     if (userType) {
@@ -248,11 +338,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       profile,
       adminToken,
       adminProfile,
+      storedAccount,
       setUserTypeAndRegister,
       switchRole,
       loginAdmin,
       logoutAdmin,
       logout,
+      restoreLastAccount,
       refreshProfile,
       updateProfile,
     }}>

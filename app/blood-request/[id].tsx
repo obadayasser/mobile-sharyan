@@ -31,6 +31,7 @@ export default function BloodRequestDetail() {
   const [offers, setOffers] = useState<DonationOffer[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [chatLoading, setChatLoading] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -83,11 +84,18 @@ export default function BloodRequestDetail() {
   };
 
   const handleStartChat = async () => {
+    if (chatLoading) return;
+    setChatLoading(true);
     try {
       const room = await chatService.createRoom(id!);
-      router.push(`/chat/${room.id}`);
+      router.push({
+        pathname: '/chat/[roomId]',
+        params: { roomId: room.id, name: request?.patientName ?? '' },
+      });
     } catch (e: any) {
       Alert.alert(t('common.error'), e?.message);
+    } finally {
+      setChatLoading(false);
     }
   };
 
