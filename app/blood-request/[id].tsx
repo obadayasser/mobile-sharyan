@@ -65,10 +65,15 @@ export default function BloodRequestDetail() {
   };
 
   const handleNotifyDonors = async () => {
+    console.log('[notify-donors] POST /blood-requests/:id/notify-donors', id);
     try {
       const res = await bloodRequestService.notifyDonors(id!);
+      console.log('[notify-donors] OK count=', res?.donors?.length);
       Alert.alert(t('bloodRequest.donorsNotified', { count: res.donors.length }));
-    } catch (e: any) { Alert.alert(t('common.error'), e?.message); }
+    } catch (e: any) {
+      console.warn('[notify-donors] FAILED', e?.message ?? e);
+      Alert.alert(t('common.error'), e?.message);
+    }
   };
 
   const handleAcceptOffer = async (offerId: string) => {

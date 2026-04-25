@@ -22,16 +22,34 @@ export default function NotificationsTab() {
   const [refreshing, setRefreshing] = useState(false);
 
   const fetch = useCallback(async () => {
-    if (!userType) return;
+    if (!userType) {
+      console.warn('[notif-list] no userType, skipping fetch');
+      return;
+    }
     try {
-      const res = await notificationService.list({
+      console.log('[notif-list] GET /notifications', { userType });
+      const res: any = await notificationService.list({
         userType,
         page: 1,
         limit: 50,
       });
-      setNotifications(res.data);
-    } catch {
-      // silently handle
+      console.log(
+        '[notif-list] response keys=',
+        res && typeof res === 'object' ? Object.keys(res) : typeof res
+      );
+      // The API may unwrap the envelope differently across endpoints —
+      // accept any of: array | { data: [...] } | { items: [...] }.
+      const list: Notification[] = Array.isArray(res)
+        ? res
+        : Array.isArray(res?.data)
+        ? res.data
+        : Array.isArray(res?.items)
+        ? res.items
+        : [];
+      console.log('[notif-list] parsed count=', list.length);
+      setNotifications(list);
+    } catch (err: any) {
+      console.warn('[notif-list] failed', err?.message ?? err);
     } finally {
       setLoading(false);
       setRefreshing(false);

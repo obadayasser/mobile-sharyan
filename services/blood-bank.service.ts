@@ -13,4 +13,5 @@ export const bloodBankService = {
   approve: (id: string) => api.patch<BloodBank>(`/blood-banks/${id}/approve`),
   reject: (id: string) => api.patch<BloodBank>(`/blood-banks/${id}/reject`),
   suspend: (id: string) => api.patch<BloodBank>(`/blood-banks/${id}/suspend`),
+  updateFcmToken: (fcmToken: string) => api.patch<void>('/blood-banks/me/fcm-token', { fcmToken }),
 };
