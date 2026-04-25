@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { View, Text, Switch, Pressable, Alert } from 'react-native';
+import { View, Text, Switch, Pressable, Alert, DevSettings, ActivityIndicator, Modal } from 'react-native';
+import { Image } from 'expo-image';
 import { useTranslation } from 'react-i18next';
 import { router } from 'expo-router';
+import * as Updates from 'expo-updates';
 import tw from 'twrnc';
 import { Header } from '@/components/layout/Header';
 import { Colors } from '@/constants/theme';
@@ -19,6 +21,7 @@ export default function Settings() {
   const donor = userType === 'DONOR' ? (profile as Donor) : null;
   const [isAvailable, setIsAvailable] = useState(donor?.isAvailable ?? true);
   const [switching, setSwitching] = useState(false);
+  const [applyingLanguage, setApplyingLanguage] = useState(false);
   const isArabic = i18n.language === 'ar';
 
   const canSwitchRole = userType === 'DONOR' || userType === 'PATIENT';
@@ -26,13 +29,29 @@ export default function Settings() {
   const targetLabel = targetRole === 'DONOR' ? t('onboarding.donor') : t('onboarding.patient');
 
   const toggleLanguage = async () => {
+    if (applyingLanguage) return;
     const newLang = isArabic ? 'en' : 'ar';
+    setApplyingLanguage(true);
+    // Let the overlay paint a frame before kicking off the reload, so the
+    // user sees a clean transition instead of a white flash.
+    await new Promise((resolve) => setTimeout(resolve, 220));
     const needsRestart = await setLanguage(newLang);
-    if (needsRestart) {
-      Alert.alert(
-        t('common.done'),
-        'Please fully close and reopen the app for the layout direction to update.'
-      );
+    if (!needsRestart) {
+      setApplyingLanguage(false);
+      return;
+    }
+    try {
+      await Updates.reloadAsync();
+    } catch {
+      try {
+        DevSettings.reload();
+      } catch {
+        setApplyingLanguage(false);
+        Alert.alert(
+          t('common.done'),
+          'Please fully close and reopen the app for the layout direction to update.'
+        );
+      }
     }
   };
 
@@ -172,6 +191,23 @@ export default function Settings() {
       <View style={tw`items-center mt-10`}>
         <Text style={tw`text-xs text-gray-300`}>{t('settings.version')} 1.0.0</Text>
       </View>
+
+      <Modal
+        visible={applyingLanguage}
+        transparent={false}
+        animationType="fade"
+        statusBarTranslucent
+        hardwareAccelerated
+      >
+        <View style={tw`flex-1 items-center justify-center bg-white`}>
+          <Image
+            source={require('@/assets/images/logo.png')}
+            style={tw`w-24 h-24 mb-6`}
+            contentFit="contain"
+          />
+          <ActivityIndicator size="large" color={Colors.primary} />
+        </View>
+      </Modal>
     </View>
   );
 }
