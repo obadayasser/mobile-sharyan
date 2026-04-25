@@ -1,3 +1,4 @@
+import '@/setup-logs';
 import '@/i18n';
 import 'react-native-reanimated';
 import { useEffect, useState } from 'react';

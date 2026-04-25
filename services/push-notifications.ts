@@ -1,10 +1,31 @@
-import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
-import Constants from 'expo-constants';
+import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { Platform } from 'react-native';
 import { Colors } from '@/constants/theme';
 
 const TAG = '[push]';
+
+// Expo Go (the off-the-shelf client) had Android push notifications removed
+// in SDK 53. Just IMPORTING `expo-notifications` there triggers a noisy
+// runtime error from its auto-registration module. We avoid that by lazy-
+// loading `expo-notifications` only when it can actually work.
+export const isExpoGo =
+  Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
+
+const pushSupported = !(isExpoGo && Platform.OS === 'android');
+
+// Lazy require so the offending module is never loaded in Expo Go on Android.
+type NotificationsModule = typeof import('expo-notifications');
+type DeviceModule = typeof import('expo-device');
+
+let Notifications: NotificationsModule | null = null;
+let Device: DeviceModule | null = null;
+
+if (pushSupported) {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  Notifications = require('expo-notifications') as NotificationsModule;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  Device = require('expo-device') as DeviceModule;
+}
 
 export type PushPermissionStatus = 'granted' | 'denied' | 'undetermined';
 
@@ -16,10 +37,8 @@ export interface PushTokenResult {
 let handlerInstalled = false;
 let androidChannelInstalled = false;
 
-// Set the foreground notification handler so notifications show even when the
-// app is open. Idempotent.
 export function setupNotificationHandler() {
-  if (handlerInstalled) return;
+  if (handlerInstalled || !Notifications) return;
   handlerInstalled = true;
   console.log(`${TAG} installing foreground handler`);
   Notifications.setNotificationHandler({
@@ -27,16 +46,14 @@ export function setupNotificationHandler() {
       shouldShowAlert: true,
       shouldPlaySound: true,
       shouldSetBadge: true,
-      // SDK 51+ split fields:
       shouldShowBanner: true,
       shouldShowList: true,
     } as any),
   });
 }
 
-// Create the Android default channel (required for Android 8+). Idempotent.
 export async function setupAndroidChannel() {
-  if (Platform.OS !== 'android' || androidChannelInstalled) return;
+  if (Platform.OS !== 'android' || androidChannelInstalled || !Notifications) return;
   androidChannelInstalled = true;
   try {
     console.log(`${TAG} creating android channels`);
@@ -61,8 +78,8 @@ export async function setupAndroidChannel() {
   }
 }
 
-// Ask the user (if needed) and return the permission status.
 export async function ensureNotificationPermission(): Promise<PushPermissionStatus> {
+  if (!Notifications || !Device) return 'denied';
   if (!Device.isDevice) {
     console.warn(`${TAG} not a physical device — push notifications are unavailable on simulators/web`);
     return 'denied';
@@ -93,11 +110,8 @@ function getProjectId(): string | undefined {
   );
 }
 
-// Try the Expo push token first (works in dev with Expo Go and managed
-// builds), then fall back to the raw FCM/APNs device token. Either is
-// acceptable to send to the backend's `fcmToken` field — the backend should
-// detect the format and route accordingly.
 export async function getPushToken(): Promise<PushTokenResult | null> {
+  if (!Notifications || !Device) return null;
   if (!Device.isDevice) return null;
 
   const projectId = getProjectId();
@@ -129,6 +143,12 @@ export async function getPushToken(): Promise<PushTokenResult | null> {
 }
 
 export async function registerForPushNotifications(): Promise<PushTokenResult | null> {
+  if (!pushSupported) {
+    console.log(
+      `${TAG} push not supported in current runtime (Expo Go on Android) — skipping registration. Use a development build to receive notifications.`
+    );
+    return null;
+  }
   setupNotificationHandler();
   await setupAndroidChannel();
   const status = await ensureNotificationPermission();
@@ -137,4 +157,22 @@ export async function registerForPushNotifications(): Promise<PushTokenResult | 
     return null;
   }
   return getPushToken();
+}
+
+// Subscribe to foreground notification arrivals. Returns an unsubscribe fn.
+export function addNotificationReceivedListener(
+  cb: (n: import('expo-notifications').Notification) => void
+): () => void {
+  if (!Notifications) return () => {};
+  const sub = Notifications.addNotificationReceivedListener(cb);
+  return () => sub.remove();
+}
+
+// Subscribe to notification taps. Returns an unsubscribe fn.
+export function addNotificationResponseListener(
+  cb: (r: import('expo-notifications').NotificationResponse) => void
+): () => void {
+  if (!Notifications) return () => {};
+  const sub = Notifications.addNotificationResponseReceivedListener(cb);
+  return () => sub.remove();
 }

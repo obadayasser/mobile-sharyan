@@ -24,11 +24,18 @@ export default function RegisterPatient() {
     const errs: Record<string, string> = {};
     if (!name.trim()) errs.name = t('common.required');
     setErrors(errs);
+    if (Object.keys(errs).length > 0) {
+      console.warn('[register-patient] validation failed', errs);
+    }
     return Object.keys(errs).length === 0;
   };
 
   const handleRegister = async () => {
-    if (!validate()) return;
+    console.log('[register-patient] submit tapped');
+    if (!validate()) {
+      Alert.alert(t('common.error'), t('common.required'));
+      return;
+    }
     setLoading(true);
     try {
       await setUserTypeAndRegister('PATIENT', {
@@ -37,9 +44,15 @@ export default function RegisterPatient() {
         latitude: location?.latitude,
         longitude: location?.longitude,
       });
+      console.log('[register-patient] success → /(tabs)');
       router.replace('/(tabs)');
     } catch (err: any) {
-      Alert.alert(t('common.error'), err?.message || t('errors.serverError'));
+      console.warn('[register-patient] FAILED', err);
+      const msg =
+        err?.message ||
+        (typeof err === 'string' ? err : JSON.stringify(err)) ||
+        t('errors.serverError');
+      Alert.alert(t('common.error'), msg);
     } finally {
       setLoading(false);
     }

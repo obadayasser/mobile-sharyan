@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import * as Notifications from 'expo-notifications';
 import { useAuth } from './AuthContext';
 import { useSocket } from './SocketContext';
 import { notificationService } from '@/services/notification.service';
@@ -10,6 +9,8 @@ import {
   registerForPushNotifications,
   setupNotificationHandler,
   setupAndroidChannel,
+  addNotificationReceivedListener,
+  addNotificationResponseListener,
 } from '@/services/push-notifications';
 
 const TAG = '[notif-ctx]';
@@ -100,19 +101,17 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
   // Refresh unread count on a foreground push arrival.
   useEffect(() => {
-    const sub = Notifications.addNotificationReceivedListener((notification) => {
+    return addNotificationReceivedListener((notification) => {
       console.log(`${TAG} foreground notification received`, notification.request.content.title);
       setUnreadCount((c) => c + 1);
     });
-    return () => sub.remove();
   }, []);
 
   // Log notification taps (useful for diagnosing routing issues).
   useEffect(() => {
-    const sub = Notifications.addNotificationResponseReceivedListener((response) => {
+    return addNotificationResponseListener((response) => {
       console.log(`${TAG} notification tapped`, response.notification.request.content);
     });
-    return () => sub.remove();
   }, []);
 
   // Existing socket-based unread bump.

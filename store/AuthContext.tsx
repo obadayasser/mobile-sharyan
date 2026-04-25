@@ -189,26 +189,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const setUserTypeAndRegister = useCallback(async (type: UserRole, registerData: any) => {
-    const id = deviceId || await getDeviceId();
+    console.log('[register] start', type, JSON.stringify(registerData));
+    const id = deviceId || (await getDeviceId());
+    console.log('[register] using deviceId', id);
     api.setDeviceAuth(id, type);
 
     let p: Profile = null;
-    switch (type) {
-      case 'DONOR':
-        p = await donorService.register(registerData);
-        break;
-      case 'PATIENT':
-        p = await patientService.register(registerData);
-        break;
-      case 'BLOOD_BANK':
-        p = await bloodBankService.register(registerData);
-        break;
+    try {
+      switch (type) {
+        case 'DONOR':
+          p = await donorService.register(registerData);
+          break;
+        case 'PATIENT':
+          p = await patientService.register(registerData);
+          break;
+        case 'BLOOD_BANK':
+          p = await bloodBankService.register(registerData);
+          break;
+      }
+    } catch (err: any) {
+      console.warn('[register] API call FAILED', {
+        type,
+        message: err?.message,
+        statusCode: err?.statusCode,
+        error: err?.error,
+      });
+      throw err;
     }
+
+    console.log('[register] API ok, profile id=', (p as any)?.id, 'name=', (p as any)?.name);
 
     await setItem(STORAGE_KEYS.USER_TYPE, type);
     setUserType(type);
     setDeviceId(id);
     setProfile(p);
+    console.log('[register] state updated, isOnboarded should now flip true');
 
     const name = (p as any)?.name || '';
     const account: StoredAccount = { type: type as StoredAccount['type'], name };

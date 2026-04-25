@@ -30,11 +30,18 @@ export default function RegisterDonor() {
     if (!bloodType) errs.bloodType = t('common.required');
     if (!location) errs.location = t('errors.locationError');
     setErrors(errs);
+    if (Object.keys(errs).length > 0) {
+      console.warn('[register-donor] validation failed', errs);
+    }
     return Object.keys(errs).length === 0;
   };
 
   const handleRegister = async () => {
-    if (!validate()) return;
+    console.log('[register-donor] submit tapped');
+    if (!validate()) {
+      Alert.alert(t('common.error'), t('common.required'));
+      return;
+    }
     setLoading(true);
     try {
       await setUserTypeAndRegister('DONOR', {
@@ -45,9 +52,15 @@ export default function RegisterDonor() {
         mobile: mobile.trim() || undefined,
         gender: gender || undefined,
       });
+      console.log('[register-donor] success → /(tabs)');
       router.replace('/(tabs)');
     } catch (err: any) {
-      Alert.alert(t('common.error'), err?.message || t('errors.serverError'));
+      console.warn('[register-donor] FAILED', err);
+      const msg =
+        err?.message ||
+        (typeof err === 'string' ? err : JSON.stringify(err)) ||
+        t('errors.serverError');
+      Alert.alert(t('common.error'), msg);
     } finally {
       setLoading(false);
     }
